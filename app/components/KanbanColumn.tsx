@@ -113,7 +113,10 @@ export function KanbanColumn({
                   ? 'bg-gray-700 border-purple-500'
                   : 'bg-gray-700 border-purple-500'
               }`}
-              onClick={() => (window.location.href = `/deals/${task.id}`)}
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.assign(`/deals/${task.id}`);
+              }}
             >
               <div className="flex justify-between items-start mb-2">
                 <h4 className="font-medium text-white text-sm leading-tight">{task.title}</h4>
