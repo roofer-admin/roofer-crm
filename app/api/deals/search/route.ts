@@ -21,8 +21,9 @@ export async function GET(req: Request) {
       .limit(20);
     if (error) throw error;
     return NextResponse.json({ ok: true, deals: data ?? [] });
-  } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err?.message ?? 'unknown' }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'unknown';
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
 

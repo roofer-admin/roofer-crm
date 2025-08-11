@@ -82,7 +82,7 @@ export default function KanbanBoard() {
   ];
 
   const [columns, setColumns] = useState<Column[]>(initialColumns);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [, setIsLoading] = useState<boolean>(false);
 
   function recomputeTotals(nextColumns: Column[]): Column[] {
     return nextColumns.map((col) => ({
@@ -91,7 +91,24 @@ export default function KanbanBoard() {
     }));
   }
 
-  function mapRowToTask(row: any): Task {
+  type DealApiRow = {
+    id: string;
+    title?: string | null;
+    description?: string | null;
+    customer_name?: string | null;
+    priority?: Task['priority'] | null;
+    project_type?: Task['projectType'] | null;
+    estimated_hours?: number | null;
+    actual_hours?: number | null;
+    assignee?: string | null;
+    due_date?: string | null;
+    status?: string | null;
+    value?: number | null;
+    days_overdue?: number | null;
+    has_warning?: boolean | null;
+  };
+
+  function mapRowToTask(row: DealApiRow): Task {
     return {
       id: row.id,
       title: row.title ?? '',
@@ -118,7 +135,7 @@ export default function KanbanBoard() {
         const res = await fetch('/api/deals', { cache: 'no-store' });
         const json = await res.json();
         if (!json.ok) throw new Error(json.error || 'Failed to load deals');
-        const tasks: Task[] = (json.deals as any[]).map(mapRowToTask);
+        const tasks: Task[] = (json.deals as DealApiRow[]).map(mapRowToTask);
         const byStatus = tasks.reduce<Record<string, Task[]>>((acc, t) => {
           acc[t.status] = acc[t.status] ? [...acc[t.status], t] : [t];
           return acc;
@@ -128,7 +145,7 @@ export default function KanbanBoard() {
           const next = prev.map((c) => ({ ...c, tasks: byStatus[c.id] ?? [] }));
           return recomputeTotals(next);
         });
-      } catch (_err) {
+      } catch {
         // keep initial mock-empty columns if API fails
       } finally {
         if (isActive) setIsLoading(false);
@@ -222,7 +239,7 @@ export default function KanbanBoard() {
       return recomputeTotals(next);
     });
     // Persist
-    const payload: any = { ...updates };
+    const payload: Partial<Task> = { ...updates };
     if ('customerName' in payload) payload.customerName = updates.customerName;
     if ('projectType' in payload) payload.projectType = updates.projectType;
     if ('estimatedHours' in payload) payload.estimatedHours = updates.estimatedHours;
@@ -288,7 +305,7 @@ export default function KanbanBoard() {
                     const res = await fetch(`/api/deals/search?q=${encodeURIComponent(q)}`);
                     const json = await res.json();
                     if (!json.ok) return;
-                    const tasks: Task[] = (json.deals as any[]).map((d) => ({
+                    const tasks: Task[] = (json.deals as { id: string; deal_name: string; priority?: Task['priority'] | null }[]).map((d) => ({
                       id: d.id,
                       title: d.deal_name,
                       description: '',

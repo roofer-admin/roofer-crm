@@ -1,10 +1,12 @@
 'use client';
 import { useState } from 'react';
 
+type CreatedDeal = { id: string; deal_name: string; priority: 'low' | 'medium' | 'high' };
+
 type Props = {
   open: boolean;
   onClose: () => void;
-  onCreated?: (deal: any) => void;
+  onCreated?: (deal: CreatedDeal) => void;
 };
 
 export default function NewDealModal({ open, onClose, onCreated }: Props) {
@@ -47,8 +49,9 @@ export default function NewDealModal({ open, onClose, onCreated }: Props) {
       setLastName('');
       setEmail('');
       setPhone('');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to create deal';
+      setError(message);
     } finally {
       setSubmitting(false);
     }

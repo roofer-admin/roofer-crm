@@ -137,7 +137,7 @@ export default function ClientView({ deal }: Props) {
                   <button
                     key={t.key}
                     className={`py-2 ${activeTab === t.key ? 'text-white border-b-2 border-purple-500' : 'text-gray-400'}`}
-                    onClick={() => setActiveTab(t.key as any)}
+                    onClick={() => setActiveTab(t.key)}
                   >
                     {t.label}
                   </button>

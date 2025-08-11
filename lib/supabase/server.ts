@@ -19,11 +19,11 @@ export function createSupabaseServerClient() {
       get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      set(name: string, value: string, options: any) {
-        cookieStore.set({ name, value, ...options });
+      set(name: string, value: string, options: Parameters<typeof cookieStore.set>[0]) {
+        cookieStore.set({ name, value, ...(options as any) });
       },
-      remove(name: string, options: any) {
-        cookieStore.set({ name, value: '', ...options });
+      remove(name: string, options: Parameters<typeof cookieStore.set>[0]) {
+        cookieStore.set({ name, value: '', ...(options as any) });
       },
     },
   });
